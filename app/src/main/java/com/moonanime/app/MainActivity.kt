@@ -3,36 +3,25 @@ package com.moonanime.app
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -44,163 +33,99 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MoonAnimeApp() {
+
+    val repository = remember {
+        AnimeRepository()
+    }
+
+    var searchText by remember {
+        mutableStateOf("")
+    }
+
+    val anime = remember(searchText) {
+        repository.searchAnime(searchText)
+    }
+
     MaterialTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = Color(0xFF090A13)
-        ) {
-            MoonAnimeHome()
-        }
-    }
-}
 
-@Composable
-fun MoonAnimeHome() {
+        Scaffold(
+            modifier = Modifier.fillMaxSize()
+        ) { padding ->
 
-    var searchText by remember { mutableStateOf("") }
-
-    val animeList = listOf(
-        "Solo Leveling",
-        "One Piece",
-        "Demon Slayer",
-        "Jujutsu Kaisen",
-        "Naruto",
-        "Attack on Titan"
-    )
-
-    val filteredAnime = animeList.filter {
-        it.contains(searchText, ignoreCase = true)
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-
-        Text(
-            text = "🌙 MoonAnime",
-            color = Color.White,
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Text(
-            text = "Watch your favorite anime",
-            color = Color.LightGray,
-            fontSize = 14.sp
-        )
-
-        Spacer(modifier = Modifier.height(18.dp))
-
-        TextField(
-            value = searchText,
-            onValueChange = { searchText = it },
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = {
-                Text("Search anime...")
-            },
-            singleLine = true,
-            shape = RoundedCornerShape(14.dp)
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(
-            text = if (searchText.isEmpty()) "🔥 Trending Anime"
-            else "🔎 Search Results",
-            color = Color.White,
-            fontSize = 21.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        if (filteredAnime.isEmpty()) {
-
-            Text(
-                text = "No anime found.",
-                color = Color.LightGray,
-                modifier = Modifier.padding(top = 20.dp)
-            )
-
-        } else {
-
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(16.dp)
             ) {
 
-                items(filteredAnime) { anime ->
+                Text(
+                    text = "MoonAnime",
+                    style = MaterialTheme.typography.headlineLarge
+                )
 
-                    AnimeCard(
-                        title = anime
-                    )
+                Text(
+                    text = "Anime streaming app",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                TextField(
+                    value = searchText,
+                    onValueChange = {
+                        searchText = it
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    placeholder = {
+                        Text("Search anime...")
+                    },
+                    singleLine = true
+                )
+
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(bottom = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+
+                    items(anime) { item ->
+
+                        AnimeCard(item)
+                    }
                 }
             }
         }
-
-        Spacer(modifier = Modifier.height(28.dp))
-
-        Text(
-            text = "⭐ Your Library",
-            color = Color.White,
-            fontSize = 21.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Button(
-            onClick = { },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Open Library")
-        }
     }
 }
 
 @Composable
-fun AnimeCard(title: String) {
+fun AnimeCard(anime: Anime) {
 
-    Box(
-        modifier = Modifier
-            .width(150.dp)
-            .height(210.dp)
-            .clip(RoundedCornerShape(18.dp))
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        Color(0xFF25284A),
-                        Color(0xFF11121E)
-                    )
-                )
-            )
-            .padding(12.dp)
+    Card(
+        modifier = Modifier.fillMaxWidth()
     ) {
 
         Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Bottom
+            modifier = Modifier.padding(16.dp)
         ) {
 
             Text(
-                text = "🎬",
-                fontSize = 45.sp
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = title,
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
+                text = anime.title,
+                style = MaterialTheme.typography.titleLarge
             )
 
             Text(
-                text = "Anime",
-                color = Color.LightGray,
-                fontSize = 12.sp
+                text = "${anime.episodes} episodes",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+
+            Text(
+                text = anime.description,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = 8.dp)
             )
         }
     }
