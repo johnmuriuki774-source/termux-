@@ -27,7 +27,6 @@ android {
 }
 
 dependencies {
-
     val composeBom =
         platform("androidx.compose:compose-bom:2026.06.00")
 
@@ -73,6 +72,7 @@ dependencies {
         "io.coil-kt.coil-network-okhttp:3.3.0"
     )
 
+    // Room
     implementation(
         "androidx.room:room-runtime:2.7.2"
     )
