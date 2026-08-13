@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -57,17 +58,27 @@ fun MoonAnimeApp() {
         mutableStateOf("All")
     }
 
+    var selectedAnime by remember {
+        mutableStateOf<Anime?>(null)
+    }
+
+    if (selectedAnime != null) {
+
+        AnimeDetailsScreen(
+            anime = selectedAnime!!,
+            onBack = {
+                selectedAnime = null
+            }
+        )
+
+        return
+    }
+
     val anime = remember(
         searchText,
         selectedCategory
     ) {
-        val results = repository.searchAnime(searchText)
-
-        if (selectedCategory == "All") {
-            results
-        } else {
-            results
-        }
+        repository.searchAnime(searchText)
     }
 
     MaterialTheme {
@@ -162,15 +173,7 @@ fun MoonAnimeApp() {
                 )
 
                 Text(
-                    text = if (searchText.isBlank()) {
-                        if (selectedCategory == "All") {
-                            "Popular Anime"
-                        } else {
-                            selectedCategory
-                        }
-                    } else {
-                        "Search Results"
-                    },
+                    text = "Popular Anime",
                     style = MaterialTheme.typography.titleLarge
                 )
 
@@ -178,41 +181,22 @@ fun MoonAnimeApp() {
                     modifier = Modifier.height(12.dp)
                 )
 
-                if (anime.isEmpty()) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
 
-                    Column(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
+                    items(
+                        items = anime,
+                        key = { it.id }
+                    ) { item ->
 
-                        Text(
-                            text = "No anime found",
-                            style = MaterialTheme.typography.titleMedium
+                        AnimeCard(
+                            anime = item,
+                            onClick = {
+                                selectedAnime = item
+                            }
                         )
-
-                        Spacer(
-                            modifier = Modifier.height(6.dp)
-                        )
-
-                        Text(
-                            text = "Try another search.",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-
-                } else {
-
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-
-                        items(
-                            items = anime,
-                            key = { it.id }
-                        ) { item ->
-
-                            AnimeCard(item)
-                        }
                     }
                 }
             }
@@ -245,10 +229,12 @@ fun CategoryChip(
 
 @Composable
 fun AnimeCard(
-    anime: Anime
+    anime: Anime,
+    onClick: () -> Unit
 ) {
 
     Card(
+        onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -299,6 +285,94 @@ fun AnimeCard(
                     text = anime.description,
                     style = MaterialTheme.typography.bodyMedium
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun AnimeDetailsScreen(
+    anime: Anime,
+    onBack: () -> Unit
+) {
+
+    MaterialTheme {
+
+        Scaffold(
+            modifier = Modifier.fillMaxSize()
+        ) { padding ->
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(16.dp)
+            ) {
+
+                item {
+
+                    Button(
+                        onClick = onBack
+                    ) {
+                        Text("← Back")
+                    }
+
+                    Spacer(
+                        modifier = Modifier.height(20.dp)
+                    )
+
+                    AsyncImage(
+                        model = anime.imageUrl,
+                        contentDescription = anime.title,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(420.dp)
+                            .clip(
+                                RoundedCornerShape(20.dp)
+                            ),
+                        contentScale = ContentScale.Crop
+                    )
+
+                    Spacer(
+                        modifier = Modifier.height(20.dp)
+                    )
+
+                    Text(
+                        text = anime.title,
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+
+                    Spacer(
+                        modifier = Modifier.height(8.dp)
+                    )
+
+                    Text(
+                        text = "${anime.episodes} episodes",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    Spacer(
+                        modifier = Modifier.height(16.dp)
+                    )
+
+                    Text(
+                        text = anime.description,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+
+                    Spacer(
+                        modifier = Modifier.height(24.dp)
+                    )
+
+                    Button(
+                        onClick = {
+                            // Video player will be connected in a later step.
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("▶ Watch Now")
+                    }
+                }
             }
         }
     }
