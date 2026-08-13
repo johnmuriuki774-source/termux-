@@ -1,8 +1,10 @@
 plugins {
     id("com.android.application")
+    id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.devtools.ksp")
 }
+
 android {
     namespace = "com.moonanime.app"
     compileSdk = 36
@@ -23,33 +25,27 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
 }
 
 dependencies {
-    val composeBom =
-        platform("androidx.compose:compose-bom:2026.06.00")
+
+    val composeBom = platform(
+        "androidx.compose:compose-bom:2026.06.00"
+    )
 
     implementation(composeBom)
 
     implementation("androidx.core:core-ktx:1.17.0")
-
-    implementation(
-        "androidx.activity:activity-compose:1.12.0"
-    )
+    implementation("androidx.activity:activity-compose:1.12.0")
 
     implementation("androidx.compose.ui:ui")
-
-    implementation(
-        "androidx.compose.ui:ui-tooling-preview"
-    )
-
-    implementation(
-        "androidx.compose.material3:material3"
-    )
-
-    implementation(
-        "androidx.compose.material:material-icons-extended"
-    )
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material:material-icons-extended")
 
     implementation(
         "androidx.lifecycle:lifecycle-runtime-compose:2.9.2"
@@ -68,10 +64,10 @@ dependencies {
     )
 
     implementation(
-        "io.coil-kt.coil-network-okhttp:3.3.0"
+        "io.coil-kt.coil3:coil-network-okhttp:3.3.0"
     )
 
-    // Room database
+    // Room
     implementation(
         "androidx.room:room-runtime:2.7.2"
     )
