@@ -72,7 +72,7 @@ dependencies {
         "io.coil-kt.coil-network-okhttp:3.3.0"
     )
 
-    // Room
+    // Room database
     implementation(
         "androidx.room:room-runtime:2.7.2"
     )
