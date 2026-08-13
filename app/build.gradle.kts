@@ -3,7 +3,6 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.devtools.ksp")
 }
-
 android {
     namespace = "com.moonanime.app"
     compileSdk = 36
